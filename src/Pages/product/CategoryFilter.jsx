@@ -29,12 +29,12 @@ const CategoryFilter = ({ categoriesList,productsList,
     <>
       <div className="grid grid-cols-2">
         {categoriesList.map((category, index) => (
-          <label key={index} class="flex items-center space-x-2">
+          <label key={index} className="flex items-center space-x-2">
             <input
               type="checkbox"
               value={category}
               onChange={handleCheck}
-              class="form-checkbox text-indigo-600"
+              className="form-checkbox text-indigo-600"
             />
             <span>{category}</span>
           </label>

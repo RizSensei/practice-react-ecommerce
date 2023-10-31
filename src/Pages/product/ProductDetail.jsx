@@ -3,9 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { AiFillStar } from "react-icons/ai";
 
 const ProductDetail = ({ productsList }) => {
-  // console.log(productsList)
   const { id } = useParams();
-  // console.log(id)
   const product = productsList[`${id}`];
   console.log(product);
   const { title, image, description, price, rating } = product;

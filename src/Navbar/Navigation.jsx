@@ -7,12 +7,12 @@ const Navigation = ({handleCart,cartItemsCount}) => {
 
   return (
     <>
-      <nav class="bg-blue-500 p-4">
-        <div class="container mx-auto flex justify-between items-center">
-          <a class="text-white text-2xl font-bold">
+      <nav className="bg-blue-500 p-4">
+        <div className="container mx-auto flex justify-between items-center">
+          <a className="text-white text-2xl font-bold">
             Ecommerce
           </a>
-          <ul class="flex space-x-4">
+          <ul className="flex space-x-4">
             <li>
               <Link to="/" className="text-white">
                 Home

@@ -5,20 +5,22 @@ import Home from "./Pages/home/Home";
 import Product from "./Pages/product/Product";
 import ProductDetail from "./Pages/product/ProductDetail";
 import Admin from "./Pages/admin/Admin";
+import CheckOut from "./Pages/checkout/CheckOut";
 import NoMatch from "./Pages/noMatch/NoMatch";
 import SideCart from "./cart/SideCart";
-import Cart from "./cart/Cart";
-import { useEffect, useState } from "react";
-
+import { useCallback, useEffect, useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const [productsList, setProductsList] = useState([]);
-  // console.log(productsList)
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [cartItemsCount, setCartItemsCount] = useState(0);
+
+  useEffect(() => {
+    localStorage.setItem("cartItems", JSON.stringify(cartItems))
+  },[cartItems])
 
   // fetch data from api
   useEffect(() => {
@@ -26,9 +28,9 @@ function App() {
       try {
         const response = await fetch("https://fakestoreapi.com/products");
         const data = await response.json();
-        const data_with_cart_status = data.map((item) => ({...item, inCart:false}))
-        setProductsList(data_with_cart_status);
-        setFilteredProducts(data_with_cart_status);
+        // const data_with_cart_status = data.map((item) => ({...item, inCart:false}))
+        setProductsList(data);
+        setFilteredProducts(data)
       } catch (error) {
         console.error("Unable to fetch data");
       }
@@ -39,14 +41,15 @@ function App() {
   useEffect(() => {
     const cartItemsCount = cartItems.length;
     setCartItemsCount(cartItemsCount);
-    console.log(cartItems.length)
   }, [cartItems]);
-
-
 
   const handleCart = () => {
     setCartOpen((prevValue) => !prevValue);
   };
+
+  const onCartChange = useCallback(arr => {
+    setCartItems(arr)
+  }, [cartItems])
 
   return (
     <div className="relative">
@@ -69,10 +72,11 @@ function App() {
             }
           ></Route>
           <Route path="/product/:id" element={<ProductDetail productsList={productsList}/>}></Route>
-          <Route path="/cart" element={<Cart cartItems={cartItems} productsList={productsList}/>}></Route>
+          <Route path="/checkout" element={<CheckOut/>}></Route>
           <Route path="*" element={<NoMatch />}></Route>
         </Routes>
       </div>
+
       {cartOpen && (
         <div className="fixed z-10 w-1/4 bg-gray-100 h-[100vh] top-0 right-0 flex">
           <SideCart
@@ -81,6 +85,10 @@ function App() {
             cartItemsCount={cartItemsCount}
             setCartItems={setCartItems}
             setCartItemsCount={setCartItemsCount}
+
+            onCartChange={(arr) => {
+              onCartChange(arr)
+            }}
           />
         </div>
       )}

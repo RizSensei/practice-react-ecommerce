@@ -7,23 +7,23 @@ import Pagination from "../../components/pagination/Pagination";
 import { ToastContainer, toast } from "react-toastify";
 
 const Product = ({
-  cartItems,
   productsList,
   setProductsList,
   filteredProducts,
   setFilteredProducts,
-  setCartItems
+  setCartItems,
+  cartItems,
 }) => {
   const [categoriesList, setCategoriesList] = useState([]);
 
   const notify = () => toast.success("Product added to Cart");
 
   const handleAddToCart = (product) => {
-    console.log(cartItems.length)
-    console.log(product)
-    // var cart_items_array = [...cartItems, product];
-    // setCartItems(cart_items_array);
-    setCartItems((cartItems) => [...cartItems, product])
+    let item = cartItems.find(item => item.id === product.id)
+    if(item){
+      return toast.error('This product has already been added')
+    }
+    setCartItems((cartItems) => [...cartItems, {...product, quantity: 1}])
     notify();
   };
 
@@ -38,17 +38,13 @@ const Product = ({
   //pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage] = useState(10);
-
   const indexOfLastRecord = currentPage * recordsPerPage;
-  // console.log(indexOfLastRecord)
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  // console.log(indexOfFirstRecord)
   const currentProducts = productsList.slice(
     indexOfFirstRecord,
     indexOfLastRecord
   );
   const nPages = Math.ceil(productsList.length / recordsPerPage);
-  // console.log(nPages)
 
   useEffect(() => {
     setFilteredProducts(currentProducts);
@@ -57,7 +53,6 @@ const Product = ({
   return (
     <>
       <ToastContainer />
-
       <div className="w-full flex justify-center my-1 space-x-3">
         <Search
           productsList={productsList}
@@ -70,14 +65,16 @@ const Product = ({
         />
       </div>
       <div className="grid grid-cols-3 lg:grid-cols-5 gap-x-3 gap-y-10 mt-3">
+        
         {/* product items listings */}
-        {currentProducts.map((product) => (
+        {filteredProducts.map((product,index) => (
           <div
             key={product.id}
             className="bg-gray-300 relative w-60 mx-auto  rounded-md overflow-hidden shadow-lg "
           >
             <div className="h-60 w-full bg-gray-600">
-            <Link to={`/product/${product.id}`} className="text-xs">
+            <Link to={`/product/${product.id}`} className="text-xs"> 
+            {/* product.id ko thau mah index halera milxa */}
               <img
                 src={product.image}
                 alt={product.name}

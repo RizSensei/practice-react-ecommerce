@@ -5,9 +5,11 @@ const Search = ({
   setFilteredProducts,
 }) => {
   const [searchedProduct, setSearchedProduct] = useState("");
+  // console.log(searchedProduct)
 
   useEffect(() => {
     const filter = productsList.filter((product) => product.title.toLowerCase().includes(searchedProduct.toLowerCase()));
+    // console.log(filter)
     setFilteredProducts(filter)
   },[searchedProduct])
 

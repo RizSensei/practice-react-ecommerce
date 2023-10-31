@@ -1,53 +1,56 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { AiOutlineShoppingCart } from "react-icons/ai";
+import CartItem from "../components/CartItem";
 import { Link } from "react-router-dom";
 
 const SideCart = ({
   handleCart,
   cartItems,
   cartItemsCount,
-  setCartItems,
   setCartItemsCount,
+  onCartChange
 }) => {
-  const [initialCartValue, setInitialCartValue] = useState(1);
-  const [totalPrice, setTotalPrice] = useState(0);
-  const [cartIndex, setCartIndex] = useState(null);
-  console.log(cartIndex)
 
-  useEffect(() => {
-    if (initialCartValue < 1) {
-      setInitialCartValue(1);
-    }
-  }, [initialCartValue]);
-
-  useEffect(() => {
-    if (cartItems.length > 0) {
-      const cart_product_prices = cartItems.map((product) => product.price);
-
-      const sum = cart_product_prices.reduce(
-        (prevValue, currValue) => (prevValue = prevValue + currValue),
-        0
-      );
-      setTotalPrice(sum);
-    }
-  }, [cartItems]);
-
-  const handleCartValue = (cartIndexValue,action) => {
-    setCartIndex(cartIndexValue)
-      if (action == "increment") {
-      return setInitialCartValue((initialCartValue) => initialCartValue + 1);
-    } else if (action == "decrement") {
-      return setInitialCartValue((initialCartValue) => initialCartValue - 1);
-    }
-  };
+  // const handleCartValue = (cartIndexValue,action) => {
+  //   setCartIndex(cartIndexValue)
+  //     if (action == "increment") {
+  //     return setInitialCartValue((initialCartValue) => initialCartValue + 1);
+  //   } else if (action == "decrement") {
+  //     return setInitialCartValue((initialCartValue) => initialCartValue - 1);
+  //   }
+  // };
 
   const DeleteCartItems = (deleteCartItem) => {
     const newCartItems = cartItems.filter(
       (cartItem) => cartItem !== deleteCartItem
     );
-    setCartItems(newCartItems);
+      onCartChange(newCartItems)
+
+
     setCartItemsCount((prevValue) => prevValue - 1);
   };
+
+
+  const onDecreaseClick = (item) => {
+    let arr = [...cartItems]
+    let index = arr.findIndex((e) => e.id === item.id)
+
+    if(index > -1){
+      arr[index].quantity = arr[index].quantity - 1;
+      onCartChange(arr)
+    }
+  }
+
+  const onIncreaseCLick = (item) => {
+    let arr = [...cartItems]
+    let index = arr.findIndex((e) => e.id === item.id)
+
+    if(index > -1){
+      arr[index].quantity = arr[index].quantity + 1;
+      onCartChange(arr)
+    }
+  }
+
 
   return (
     <div className="w-full p-2 font-bold">
@@ -55,7 +58,7 @@ const SideCart = ({
         <h1 className="flex justify-center items-center space-x-2">
           <AiOutlineShoppingCart />
           <span>
-            Cart <span className="text-blue-500">({cartItemsCount})</span>{" "}
+            Cart <span className="text-blue-500">({cartItemsCount})</span>
           </span>
         </h1>
         <button
@@ -67,63 +70,23 @@ const SideCart = ({
       </div>
       <div className="mt-3 text-xs">
         {cartItems?.map((cartItem, index) => (
-          <div
-            key={index}
-            className="flex space-x-2 p-1.5 border-2 border-gray-500 rounded-md mb-1"
-          >
-            <div className="w-16 h-16 aspect-square">
-              <img
-                src={cartItem.image}
-                alt={cartItem.title}
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="space-y-2 w-full">
-              <div className="flex justify-between">
-                <span className="text-[13px]">{cartItem.title}</span>
-                <button
-                  className="text-red-500 hover:scale-110"
-                  onClick={() => DeleteCartItems(cartItem)}
-                >
-                  x
-                </button>
-              </div>
-
-              <div className="flex w-full  justify-between">
-                <div className="flex space-x-1">
-                  <button
-                    onClick={() => handleCartValue(index, "decrement")}
-                    className="p-1 bg-gray-200 hover:bg-gray-300 h-5 w-5 flex items-center justify-center"
-                  >
-                    -
-                  </button>
-                  <input
-                    type="text"
-                    value={initialCartValue}
-                    className="p-1 bg-gray-200 h-5 w-5 text-center text-xs"
-                  />
-                  <button
-                    onClick={() => handleCartValue(index,"increment")}
-                    className="p-1 bg-gray-200 hover:bg-gray-300 h-5 w-5 flex items-center justify-center"
-                  >
-                    +
-                  </button>
-                </div>
-                <div className="text-blue-500">
-                  $ {cartItem.price * initialCartValue}
-                </div>
-              </div>
-            </div>
-          </div>
+          <CartItem cartItem={cartItem} key={index} onIncreaseCLick={onIncreaseCLick} onDecreaseClick={onDecreaseClick} onDeleteClick={DeleteCartItems} />
         ))}
       </div>
       <div className="mt-3 flex flex-col font-normal space-y-2">
         <div className="w-full flex justify-end">
-          <span>Total : $ {totalPrice}</span>
+          <span>Total : $ {
+            cartItems?.reduce((prevValue,currValue) => {
+              return prevValue + (currValue.quantity * currValue.price);
+            }, 0)
+            }</span>
         </div>
-        <button className="bg-purple-500 hover:bg-purple-600 text-white rounded-sm p-1.5">
+        <Link to="/checkout">
+          <button className="bg-purple-500 hover:bg-purple-600 text-white rounded-sm p-1.5">
           Proceed to CheckOut
         </button>
+        </Link>
+        
       </div>
     </div>
   );
