@@ -3,10 +3,29 @@ import Search from "./Search";
 import CategoryFilter from "./CategoryFilter";
 import { AiOutlineShoppingCart } from "react-icons/ai";
 import { Link } from "react-router-dom";
+import Pagination from "../../components/pagination/Pagination";
+import { ToastContainer, toast } from "react-toastify";
 
-const Product = ({handleAddToCart,cartItems,productsList,setProductsList,filteredProducts,setFilteredProducts}) => {
-
+const Product = ({
+  cartItems,
+  productsList,
+  setProductsList,
+  filteredProducts,
+  setFilteredProducts,
+  setCartItems
+}) => {
   const [categoriesList, setCategoriesList] = useState([]);
+
+  const notify = () => toast.success("Product added to Cart");
+
+  const handleAddToCart = (product) => {
+    console.log(cartItems.length)
+    console.log(product)
+    // var cart_items_array = [...cartItems, product];
+    // setCartItems(cart_items_array);
+    setCartItems((cartItems) => [...cartItems, product])
+    notify();
+  };
 
   // fetch and collect categories
   useEffect(() => {
@@ -16,8 +35,29 @@ const Product = ({handleAddToCart,cartItems,productsList,setProductsList,filtere
     setCategoriesList(categories);
   }, []);
 
+  //pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [recordsPerPage] = useState(10);
+
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  // console.log(indexOfLastRecord)
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  // console.log(indexOfFirstRecord)
+  const currentProducts = productsList.slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
+  const nPages = Math.ceil(productsList.length / recordsPerPage);
+  // console.log(nPages)
+
+  useEffect(() => {
+    setFilteredProducts(currentProducts);
+  }, []);
+
   return (
     <>
+      <ToastContainer />
+
       <div className="w-full flex justify-center my-1 space-x-3">
         <Search
           productsList={productsList}
@@ -29,43 +69,46 @@ const Product = ({handleAddToCart,cartItems,productsList,setProductsList,filtere
           categoriesList={categoriesList}
         />
       </div>
-      <div className="grid grid-cols-3 lg:grid-cols-4 gap-5 mt-3">
-        {filteredProducts.map((product) => (
-          
+      <div className="grid grid-cols-3 lg:grid-cols-5 gap-x-3 gap-y-10 mt-3">
+        {/* product items listings */}
+        {currentProducts.map((product) => (
           <div
             key={product.id}
-            className="w-64 mx-auto bg-white rounded overflow-hidden shadow-lg"
+            className="bg-gray-300 relative w-60 mx-auto  rounded-md overflow-hidden shadow-lg "
           >
-            <div className="h-60 w-full">
+            <div className="h-60 w-full bg-gray-600">
+            <Link to={`/product/${product.id}`} className="text-xs">
               <img
                 src={product.image}
                 alt={product.name}
-                className="h-full w-full"
+                className="h-full w-full hover:scale-105"
               />
+              </Link>
             </div>
             <div className="px-2 py-2">
-              <div className="font-bold text-sm mb-2">{product.title}</div>
-              {/* <div className="text-gray-700 text-xs h-16 overflow-y-scroll">
-                {product.description}
-              </div> */}
+              <div className="font-semibold text-sm mb-2">{product.title}</div>
             </div>
-            <div className="px-4 py-2 text-xs flex justify-center space-x-2 font-bold">
-              <span className="flex items-center bg-gray-200 rounded-full px-3 py-1  text-gray-700">
-                #{product.category}
+            <div className="px-4 py-2 text-xs flex font-bold">
+              <span className="absolute top-5 right-1 flex items-center bg-blue-500 text-white rounded-full px-3 py-1 font-medium">
+                {product.category}
               </span>
-              <span className="flex items-center bg-gray-200 rounded-full px-3 py-1  text-gray-700">
+              <span className="w-full flex justify-end text-gray-700">
                 ${product.price}
               </span>
-              <span className="flex items-center cursor-pointer bg-gray-200 hover:bg-blue-500 hover:text-white rounded-full px-3 py-1  text-gray-700">
+              <span className="absolute top-[55%] right-1 aspect-square flex items-center cursor-pointer text-white bg-blue-500 hover:bg-blue-600 hover:text-white rounded-full px-3 py-1 font-medium">
                 <button onClick={() => handleAddToCart(product)}>
                   <AiOutlineShoppingCart />
                 </button>
               </span>
             </div>
-            <Link to ={`/product/${product.id}`} className="text-xs">More Details</Link>
           </div>
         ))}
       </div>
+      <Pagination
+        nPages={nPages}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+      />
     </>
   );
 };

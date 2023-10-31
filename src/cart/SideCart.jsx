@@ -2,9 +2,17 @@ import React, { useEffect, useState } from "react";
 import { AiOutlineShoppingCart } from "react-icons/ai";
 import { Link } from "react-router-dom";
 
-const SideCart = ({ handleCart, cartItems, cartItemsCount, setCartItems, setCartItemsCount }) => {
+const SideCart = ({
+  handleCart,
+  cartItems,
+  cartItemsCount,
+  setCartItems,
+  setCartItemsCount,
+}) => {
   const [initialCartValue, setInitialCartValue] = useState(1);
-  // const [cartIndex, setCartIndex] = useState(null);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [cartIndex, setCartIndex] = useState(null);
+  console.log(cartIndex)
 
   useEffect(() => {
     if (initialCartValue < 1) {
@@ -12,24 +20,34 @@ const SideCart = ({ handleCart, cartItems, cartItemsCount, setCartItems, setCart
     }
   }, [initialCartValue]);
 
-  const handleCartValue = (cartIndexValue, action) => {
-   const updatedCartItems = [...cartItems]
-   const currentItem = updatedCartItems[cartIndexValue]
-  //  console.log(currentItem)
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      const cart_product_prices = cartItems.map((product) => product.price);
 
-    console.log(cartIndexValue)
-      if (action == "increment" && currentItem) {
-        setInitialCartValue((initialCartValue) => initialCartValue + 1);
-      } else if (action == "decrement" && currentItem) {
-        setInitialCartValue((initialCartValue) => initialCartValue - 1);
-      }
+      const sum = cart_product_prices.reduce(
+        (prevValue, currValue) => (prevValue = prevValue + currValue),
+        0
+      );
+      setTotalPrice(sum);
+    }
+  }, [cartItems]);
+
+  const handleCartValue = (cartIndexValue,action) => {
+    setCartIndex(cartIndexValue)
+      if (action == "increment") {
+      return setInitialCartValue((initialCartValue) => initialCartValue + 1);
+    } else if (action == "decrement") {
+      return setInitialCartValue((initialCartValue) => initialCartValue - 1);
+    }
   };
 
   const DeleteCartItems = (deleteCartItem) => {
-    const newCartItems = cartItems.filter((cartItem) => cartItem !== deleteCartItem)
+    const newCartItems = cartItems.filter(
+      (cartItem) => cartItem !== deleteCartItem
+    );
     setCartItems(newCartItems);
-    setCartItemsCount((prevValue) => prevValue - 1)
-  }
+    setCartItemsCount((prevValue) => prevValue - 1);
+  };
 
   return (
     <div className="w-full p-2 font-bold">
@@ -63,7 +81,12 @@ const SideCart = ({ handleCart, cartItems, cartItemsCount, setCartItems, setCart
             <div className="space-y-2 w-full">
               <div className="flex justify-between">
                 <span className="text-[13px]">{cartItem.title}</span>
-                <button className="text-red-500 hover:scale-110" onClick={() => DeleteCartItems(cartItem)}>x</button>
+                <button
+                  className="text-red-500 hover:scale-110"
+                  onClick={() => DeleteCartItems(cartItem)}
+                >
+                  x
+                </button>
               </div>
 
               <div className="flex w-full  justify-between">
@@ -76,11 +99,11 @@ const SideCart = ({ handleCart, cartItems, cartItemsCount, setCartItems, setCart
                   </button>
                   <input
                     type="text"
-                    value= {initialCartValue}
+                    value={initialCartValue}
                     className="p-1 bg-gray-200 h-5 w-5 text-center text-xs"
                   />
                   <button
-                    onClick={() => handleCartValue(index, "increment")}
+                    onClick={() => handleCartValue(index,"increment")}
                     className="p-1 bg-gray-200 hover:bg-gray-300 h-5 w-5 flex items-center justify-center"
                   >
                     +
@@ -95,12 +118,9 @@ const SideCart = ({ handleCart, cartItems, cartItemsCount, setCartItems, setCart
         ))}
       </div>
       <div className="mt-3 flex flex-col font-normal space-y-2">
-        <Link
-          to="/cart"
-          className="bg-blue-500 hover:bg-blue-600 text-white rounded-sm p-1.5 text-center"
-        >
-          Show Cart
-        </Link>
+        <div className="w-full flex justify-end">
+          <span>Total : $ {totalPrice}</span>
+        </div>
         <button className="bg-purple-500 hover:bg-purple-600 text-white rounded-sm p-1.5">
           Proceed to CheckOut
         </button>

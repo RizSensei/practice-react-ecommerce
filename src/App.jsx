@@ -9,18 +9,16 @@ import NoMatch from "./Pages/noMatch/NoMatch";
 import SideCart from "./cart/SideCart";
 import Cart from "./cart/Cart";
 import { useEffect, useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
+
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const [productsList, setProductsList] = useState([]);
-  console.log(productsList)
+  // console.log(productsList)
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [cartItemsCount, setCartItemsCount] = useState(0);
-
-  const notify = () => toast.success("Product added to Cart");
 
   // fetch data from api
   useEffect(() => {
@@ -41,14 +39,10 @@ function App() {
   useEffect(() => {
     const cartItemsCount = cartItems.length;
     setCartItemsCount(cartItemsCount);
+    console.log(cartItems.length)
   }, [cartItems]);
 
-  const handleAddToCart = (product) => {
-    var cart_items_array = [...cartItems];
-    cart_items_array = [...cartItems, product];
-    setCartItems(cart_items_array);
-    notify();
-  };
+
 
   const handleCart = () => {
     setCartOpen((prevValue) => !prevValue);
@@ -57,7 +51,6 @@ function App() {
   return (
     <div className="relative">
       <Navigation handleCart={handleCart} cartItemsCount={cartItemsCount} />
-      <ToastContainer />
       <div className="h-[80vh]">
         <Routes>
           <Route path="/" element={<Home />}></Route>
@@ -66,12 +59,12 @@ function App() {
             path="/product"
             element={
               <Product
-                handleAddToCart={handleAddToCart}
                 cartItems={cartItems}
                 productsList={productsList}
                 setProductsList={setProductsList}
                 filteredProducts={filteredProducts}
                 setFilteredProducts={setFilteredProducts}
+                setCartItems={setCartItems}
               />
             }
           ></Route>
