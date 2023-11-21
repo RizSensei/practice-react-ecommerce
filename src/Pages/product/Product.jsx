@@ -67,7 +67,7 @@ const Product = ({
       <div className="grid grid-cols-3 lg:grid-cols-5 gap-x-3 gap-y-10 mt-3">
         
         {/* product items listings */}
-        {filteredProducts.map((product,index) => (
+        {filteredProducts?.map((product) => (
           <div
             key={product.id}
             className="bg-gray-300 relative w-60 mx-auto  rounded-md overflow-hidden shadow-lg "
